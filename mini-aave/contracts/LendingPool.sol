@@ -20,7 +20,7 @@ contract LendingPool{
 
   function deposit(address token,uint256 amount) external{
      IERC20(token).transferFrom(msg.sender,address(this),amount);
-     deposit[msg.sender][token] += account;
+     deposit[msg.sender][token] += amount;
   }
 
  function borrow(address token,uint256 amount) external{
@@ -31,4 +31,20 @@ contract LendingPool{
     require(amount <= maxBorrow,"Exceeds max borrow limit");
     borrows[msg.sender][token] += amount;
     IERC20(token).transfer(msg.sender,amount);
+  }
+
+  function repay(address token,uint256 amount) external{
+   IERC20(token).transferFrom(msg.sender,address(this),amount);
+   borrows[msg.sender][token] -= amount;
+  }
+
+  function healthFactor(address user,address token) public view returns (uint256){
+   uint256 pirce = oracle.getPrice(token);
+   uint256 collateralValue = deposit[user][token] * price / 1e18;
+   uint256 debtValue = borrows[user][token] * price / 1e18;
+
+   if(debtValue == 0) return type(uint256).max;
+   return collateralValue * LIQ_THRESHOLD * 1e18 / (debtValue * 100);
+  }
+
 }
