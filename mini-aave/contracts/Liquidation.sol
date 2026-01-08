@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "./LendingPool.sol";
-import "./interface/IERC20.sol";
+import "./interfaces/IERC20.sol";
 
 contract Liquidation{
     uint256 public constant BONUS = 5; // 5%
